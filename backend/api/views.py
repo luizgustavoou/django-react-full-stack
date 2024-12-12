@@ -1,3 +1,9 @@
+from django.http import HttpResponse
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from rest_framework.decorators import api_view, permission_classes
+
 from django.contrib.auth.models import User
 from rest_framework import generics, filters
 from .serializers import CourseSerializar, UserSerializer, NoteSerializer
@@ -70,3 +76,20 @@ class CourseListCreate(generics.ListCreateAPIView):
     serializer_class = CourseSerializar
     queryset = Course.objects.all()
     permission_classes = [IsAuthenticated]
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated]) 
+def bind_student_to_course(request, course_id):
+    if not request.user.is_authenticated:
+
+        return HttpResponse("Você precisa estar logado para se inscrever em um curso.", status=401)
+
+
+    # Obtém o curso e adiciona o usuário
+    course = get_object_or_404(Course, pk=course_id)
+    request.user.courses.add(course)
+
+    # Retorna uma resposta usando a classe Response
+    return HttpResponse("Você foi inscrito no curso com sucesso.", status=200)
+
