@@ -11,7 +11,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Course, Note
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import CreateAPIView
-
+from rest_framework.views import APIView
+from django.views import View
 class CustomPageNumberPagination(PageNumberPagination):
     page_size = 5
     page_size_query_param = "limit"
@@ -81,15 +82,18 @@ class CourseListCreate(generics.ListCreateAPIView):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated]) 
 def bind_student_to_course(request, course_id):
-    if not request.user.is_authenticated:
-
-        return HttpResponse("Você precisa estar logado para se inscrever em um curso.", status=401)
-
-
-    # Obtém o curso e adiciona o usuário
     course = get_object_or_404(Course, pk=course_id)
     request.user.courses.add(course)
 
-    # Retorna uma resposta usando a classe Response
-    return HttpResponse("Você foi inscrito no curso com sucesso.", status=200)
+    return Response("Você foi inscrito no curso com sucesso.", status=200)
+
+class BindStudentToCourse(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, course_id):
+        course = get_object_or_404(Course, pk=course_id)
+        request.user.courses.add(course)
+
+        
+        return HttpResponse("Você foi inscrito no curso com sucesso.", status=200)
 

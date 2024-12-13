@@ -6,5 +6,6 @@ urlpatterns = [
     path("notes/delete/<int:pk>/", views.NoteDelete.as_view(), name="delete-note"),
     path("notes/<int:pk>/", views.NoteRetrieveAPIView.as_view(), name="note-detail"),
     path("courses/", views.CourseListCreate.as_view(), name="course-list"),
-    path("courses/<int:course_id>/bind/", views.bind_student_to_course, name="bind-student-to-course"),
+    # path("courses/<int:course_id>/bind/", views.bind_student_to_course, name="bind-student-to-course"),
+    path('courses/<int:course_id>/bind/', views.BindStudentToCourse.as_view(), name='bind-student-to-course'),
 ]
