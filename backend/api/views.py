@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from rest_framework import generics, filters
 from .serializers import CourseSerializar, UserSerializer, NoteSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Course, Note
+from .models import Course, Note, Student
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
@@ -92,8 +92,13 @@ class BindStudentToCourse(generics.GenericAPIView):
 
     def post(self, request, course_id):
         course = get_object_or_404(Course, pk=course_id)
+        
+        student = Student.objects.get(user=request.user, course=course)
+        
+        if student is not None:
+            return HttpResponse("Você já está inscrito neste curso.", status=400)
+        
         request.user.courses.add(course)
-
         
         return HttpResponse("Você foi inscrito no curso com sucesso.", status=200)
 
